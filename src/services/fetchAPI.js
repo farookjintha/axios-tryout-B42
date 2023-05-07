@@ -47,4 +47,3 @@ export const deleteUser = async (userId) => {
     const data = await response.json();
     return data;
 };
-

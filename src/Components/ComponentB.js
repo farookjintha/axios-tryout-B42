@@ -1,92 +1,85 @@
 import { useState, useEffect } from 'react';
-import { addNewUser, deleteUser, getAllUsers, updateUser } from '../services/axiosAPI';
+import { addNewQuote, deleteQuote, getAllQuotes, updateQuote, getQuoteById } from '../services/axiosAPI';
 
 const ComponentB = () => {
-    const [users, setUsers] = useState([]);
+    const [quotes, setQuotes] = useState([]);
+    const [newQuote, setNewQuote] = useState('');
+    const [author, setAuthor] = useState('');
 
     useEffect(() => {
-        getUsersList();
+        getQuotesList();
     }, []);
 
 
-
-    const getUsersList = async () => {
-        const usersList = await getAllUsers();
-        setUsers(usersList);
+    const getQuotesList = async () => {
+        const response = await getAllQuotes();
+        setQuotes(response.data.quotes);
     };
 
-    const addUser = async () => {
+    const addQuote = async () => {
         const payload = {
-           name: 'Farook',
-           email: 'farook@zyz.com',
-           mobileNumber: '14234242',
-           level: 'Software Engineer'
+           quote: newQuote,
+           author: author
           };
 
-          await addNewUser(payload);
-          const updatedList = await getAllUsers();
-          console.log(updatedList)
-          setUsers(updatedList.data);
+          const response = await addNewQuote(payload);
+          if(response.data){
+          console.log(response.data)
 
+            getQuotesList();
+          }
     }
 
-    const updateExistingUser = async () => {
+    const updateExisitingQuote = async (quoteId) => {
         const payload = {
+            quote: newQuote,
+            author: author
+           };
 
-            "name": "Farook",
-            "username": "fj",
-            "email": "fj@xyz.biz",
-            "address": {
-              "street": "Kulas Light",
-              "suite": "Apt. 556",
-              "city": "Gwenborough",
-              "zipcode": "92998-3874",
-              "geo": {
-                "lat": "-37.3159",
-                "lng": "81.1496"
-              }
-            },
-            "phone": "1-990-736-8931 x56442",
-            "website": "xyz.org",
-            "company": {
-              "name": "ZA-Crona",
-              "catchPhrase": "Multi-layered client-server neural-net",
-              "bs": "harness real-time e-markets"
-            }
-          };
+          const response = await updateQuote(quoteId, payload);
+          
+          if(response.data){
+          console.log(response.data)
 
-          const response = await updateUser(2, payload);
-          console.log('User Updated: ', response);
+            getQuotesList();
+          }
     }
 
-    const deleteExistingUser = async () => {
-        const response = await deleteUser(2);
-        console.log('User Deleted: ', response);
+    const deleteExistingQuote = async (quoteId) => {
+        const response = await deleteQuote(quoteId);
+        if(response.data){
+          console.log(response.data)
+            getQuotesList();
+          }
     }
 
     return (
         <div>
-            <h1>Getting users using Fetch</h1>
+            <h1>Getting users using Axios</h1>
 
-            <button onClick={addUser}>Add a new User</button>
-            <button onClick={updateExistingUser}>Update User</button>
-            <button onClick={deleteExistingUser}>Delete User</button>
+            <input type='text' onChange={e => setNewQuote(e.target.value)} />
+            <input type='text' onChange={e => setAuthor(e.target.value)} />
+
+            <div>
+                <button onClick={addQuote}>Add a new Quote</button>
+            </div>
             
 
             {
-                users.length ? (
+                quotes.length ? (
                     <div>
-                        {users.map((user, i) => (
+                        {quotes.map((data, i) => (
                             <div key={i}>
-                                <h1>Name: {user.name}</h1>
-                                <h2>Email: {user.email}</h2>
-                                <h2>Phone: {user.phone}</h2>
+                                <h1>Quote: {data.quote}</h1>
+                                <h2>Author: {data.author}</h2>
+                                <button onClick={() => deleteExistingQuote(data._id)}>Delete</button>
+                                <button onClick={() => updateExisitingQuote(data._id)}>Update</button>
                             </div>
                         ))}
                     </div>
                 ) : (
                     <div>
-                        No Users Found
+                        No Quotes Found
                     </div>
                 )
             }
@@ -103,3 +96,13 @@ export default ComponentB;
 // POST = /users -> req.body
 // PUT = /users/1 -> req.body
 // DELETE = /users/4 
+
+
+// “You know you're in love when you can't fall asleep because reality is finally better than your dreams.”
+// ― Dr. Seuss
+
+// “You only live once, but if you do it right, once is enough.”
+// ― Mae West
+
+// “In three words I can sum up everything I've learned about life: it goes on.”
+// ― Robert Frost
